@@ -6,4 +6,4 @@ def register_routes(app,db,bcrypt):
     
     @app.route('/')
     def index():
-        return f"<h1>Hello world</h1>"
+        return render_template("index.html")
