@@ -62,8 +62,7 @@ def register_routes(app,db,bcrypt):
             db.session.add(new_user)
             db.session.commit()
 
-            #return jsonify({'message': 'success'}), 200
-            return redirect(url_for('test'))
+            return jsonify({'message': 'success'}), 200
         
         
     @app.route('/login',methods=['POST'])

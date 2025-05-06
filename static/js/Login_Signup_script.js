@@ -72,7 +72,8 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
         if (response.ok) {
             createToast(data.message)
             console.log(data.message)
-            window.location.href = "/test";
+            setTimeout(() => window.location.reload() , 2500); // Removing the toast after 500ms
+            // window.location.href = "/";
         } else {
             createToast(data.error)
             console.log(data.error)
@@ -93,7 +94,7 @@ const toastDetails = {
     timer: 5000,
     success: {
         icon: 'bx bxs-check-circle',
-        text: 'Success: Account created successfully.',
+        text: 'Success: Account created successfully. Please login.',
     },
     error: {
         icon: 'bx bxs-x-circle',
