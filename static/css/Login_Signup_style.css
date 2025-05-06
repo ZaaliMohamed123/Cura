@@ -282,12 +282,10 @@ form {
 
 .toggle-panel.toggle-left img {
   width: 40%;
-  margin-bottom: 20px;
 }
 
 .toggle-panel.toggle-right img {
   width: 40%;
-  margin-bottom: 20px;
 }
 
 @media screen and (max-width: 650px) {
