@@ -24,6 +24,9 @@ class Users(db.Model, UserMixin):
     adverse_reports = db.relationship('AI_Adverse_Effect_Reports',back_populates='patient',cascade='all, delete-orphan')
     medication_reminders = db.relationship('Medication_Reminders',back_populates='patient',cascade='all, delete-orphan')
     medication_logs = db.relationship('Medication_Intake_Logging',back_populates='patient',cascade='all, delete-orphan')
+    
+    def get_id(self):
+        return self.user_id
 
 class Mentorship(db.Model):
     __tablename__ = 'mentorship'

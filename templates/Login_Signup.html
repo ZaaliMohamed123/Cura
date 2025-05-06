@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE-edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="css/Login_Signup_style.css">
+    <link rel='stylesheet' href='css/boxicons.min.css' >
+</head>
+<body>
+    <ul class="notifications"></ul>
+    <div class="container">
+        <div class="form-box login">
+            <form id="login-form" autocomplete="off">
+                <h1>Login</h1>
+                <div class="input-box">
+                    <input type="email" id="email_login" name="email_login" placeholder="Email" required autocomplete="off">
+                    <i class="bx bxs-envelope"></i>
+                </div>
+                <div class="input-box">
+                    <input id="password_login" name="password_login" type="password" placeholder="Password" required>
+                    <i class="bx bxs-lock-alt"></i>
+                </div>
+                <div class="forgot-link">
+                    <a href="#">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>  
+        </div>
+
+        <div class="form-box register">
+            <form id="signup-form" autocomplete="off">
+                <h1>Registration</h1>
+                <div class="input-box">
+                    <input id="first_name" name="first_name" type="text" placeholder="First name" required>
+                    <i class="bx bxs-user"></i>
+                </div>
+                <div class="input-box">
+                    <input id="last_name" name="last_name" type="text" placeholder="Last name" required>
+                    <i class="bx bxs-user"></i>
+                </div>
+                <div class="input-box">
+                    <input type="email" id="email_signup" name="email_signup" placeholder="Email" required autocomplete="off">
+                    <i class="bx bxs-envelope"></i>
+                </div>
+                <div class="input-box">
+                    <input id="password_signup" type="password" name="password_signup" placeholder="Password" required>
+                    <i class="bx bxs-lock-alt"></i>
+                </div>
+                <div class="input-box">
+                    <input type="tel" id="phone_number" name="phone_number" placeholder="Phone number" required>
+                    <i class='bx bxs-phone'></i>
+                </div>
+                <div class="input-box">
+                    <input type="text" id="date_of_birth" name="date_of_birth" placeholder="Date of birth" required>
+                    <i class='bx bx-calendar'></i>
+                </div>
+                <button type="submit" class="btn">Register</button>
+            </form>  
+        </div>
+
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <img src="svg/logos/logo_svg_3_no_back.svg" alt="Logo">
+                <h1>Hello, Welcome!</h1>
+                <p>First time here? Register now.</p>
+                <button class="btn register-btn">Register</button>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <img src="svg/logos/logo_svg_3_no_back.svg" alt="Logo">
+                <h1>Welcome Back!</h1>
+                <p>Already have an account?</p>
+                <button class="btn login-btn">Login</button>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="js/Login_Signup_script.js"></script>
+</body>
+</html>
