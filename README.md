@@ -1,6 +1,6 @@
-# MediMate
+# Cura
 
-MediMate is a Flask-based web application for managing patient medication and mentorships.
+Cura is a Flask-based web application for managing patient medication and mentorships.
 
 ## Project Structure
 
@@ -28,7 +28,7 @@ MediMate is a Flask-based web application for managing patient medication and me
 
 ```bash
 git clone <repository-url>
-cd MediMate
+cd Cura
 ```
 
 2. **Create and activate a virtual environment**
@@ -55,11 +55,11 @@ pip install -r requirements.txt
 
 4. **Set environment variables**
 
-Create a `.env` file in the root directory and add:
+Create a `.env` file in the app directory and add:
 
 ```
 SECRET_KEY=your_secret_key_here
-DATABASE_URL=sqlite:///./MediMateDB.db
+DATABASE_URL=sqlite:///./CuraDB.db
 ```
 
 Replace `your_secret_key_here` with a secure secret key.
@@ -69,6 +69,7 @@ Replace `your_secret_key_here` with a secure secret key.
 Use Flask-Migrate commands to set up the database schema:
 
 ```bash
+cd app
 flask db init
 flask db migrate -m "Initial migration."
 flask db upgrade
