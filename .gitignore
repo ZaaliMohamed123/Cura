@@ -9,8 +9,6 @@ __pycache__/
 # Ignore environment variables file
 .env
 
-# Ignore database files (if using SQLite)
-*.sqlite3
 
 # Ignore IDE-specific files
 .vscode/
