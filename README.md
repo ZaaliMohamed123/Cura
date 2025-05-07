@@ -28,6 +28,7 @@ Cura is a Flask-based web application for managing patient medication and mentor
 
 ```bash
 git clone <repository-url>
+cd Cura
 ```
 
 2. **Create and activate a virtual environment**
