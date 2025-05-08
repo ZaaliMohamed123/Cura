@@ -12,7 +12,7 @@ def register_routes(app,db,bcrypt):
     
     @app.route('/test')
     def test():
-        return render_template('index.html')
+        return render_template("core.html")
     
     @app.route('/signup', methods=['GET', 'POST'])
     def signup():
