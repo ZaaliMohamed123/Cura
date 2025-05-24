@@ -1,6 +1,6 @@
 from flask import render_template,request,redirect,url_for,jsonify,flash
 from flask_login import login_user,logout_user,current_user,login_required
-from models import Users,Medications
+from models import Users,Medications,Pathologies
 from datetime import datetime
 
 
@@ -197,5 +197,111 @@ def register_routes(app,db,bcrypt):
                 flash('An error occurred while updating the medication. Please try again.', 'danger')
                 app.logger.error(f'Error updating medication: {e}')
                 return redirect(url_for('add_medication'))
+        
+    @app.route('/pathologies')
+    def pathologies():
+        pathologies = Pathologies.query.filter_by(patient_id=current_user.user_id).all()
+        return render_template('pathologies.html', pathologies=pathologies)
+    
+    @app.route('/add_pathology', methods=['GET', 'POST'])
+    @login_required
+    def add_pathology():
+        if request.method == 'GET':
+            return render_template('add_pathology.html')
+        elif request.method == 'POST':
+            # Extract form data
+            condition_name = request.form.get('conditionName')
+            diagnosis_date = request.form.get('diagnosisDate')
+            notes = request.form.get('notes')
 
+            # Validate form data
+            if not condition_name or not diagnosis_date:
+                flash('Condition name and diagnosis date are required!', 'danger')
+                return redirect(url_for('add_pathology'))
+
+            # Convert diagnosis_date to datetime.date object
+            try:
+                diagnosis_date = datetime.strptime(diagnosis_date, '%Y-%m-%d').date()
+            except ValueError:
+                flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
+                return redirect(url_for('add_pathology'))
+
+            # Create a new Pathology instance
+            new_pathology = Pathologies(
+                patient_id=current_user.user_id,
+                condition_name=condition_name,
+                diagnosis_date=diagnosis_date,
+                notes=notes
+            )
+
+            # Add to the database
+            try:
+                db.session.add(new_pathology)
+                db.session.commit()
+                flash('Pathology added successfully!', 'success')
+                return redirect(url_for('pathologies'))
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while adding the pathology. Please try again.', 'danger')
+                return redirect(url_for('add_pathology'))
             
+    @app.route('/delete_pathology/<int:path_id>')
+    @login_required
+    def delete_pathology(path_id):
+        path = Pathologies.query.filter_by(pathology_id=path_id, patient_id=current_user.user_id).first()
+        if path:
+            db.session.delete(path)
+            db.session.commit()
+            flash('Pathology deleted successfully.', 'success')
+        else:
+            flash('Pathology not found or unauthorized.', 'error')
+        return redirect(url_for('pathologies'))
+    
+    @app.route('/edit_pathology/<int:path_id>', methods=['GET', 'POST'])
+    @login_required
+    def edit_pathology(path_id):
+        path = Pathologies.query.filter_by(pathology_id=path_id, patient_id=current_user.user_id).first()
+        
+        if not path:
+            flash('Pathology not found or unauthorized.', 'danger')
+            return redirect(url_for('pathologies'))
+
+        if request.method == 'GET':
+            # Render the form with the current pathology data
+            return render_template('edit_pathology.html', path=path)
+
+        elif request.method == 'POST':
+            # Extract form data
+            condition_name = request.form.get('conditionName')
+            diagnosis_date = request.form.get('diagnosisDate')
+            notes = request.form.get('notes')
+
+            # Validate form data
+            if not condition_name or not diagnosis_date:
+                flash('Condition Name and Diagnosis Date are required!', 'danger')
+                return render_template('edit_pathology.html', path=path)
+
+            # Convert diagnosis_date to datetime.date object
+            try:
+                diagnosis_date = datetime.strptime(diagnosis_date, '%Y-%m-%d').date()
+            except ValueError:
+                flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
+                return render_template('edit_pathology.html', path=path)
+
+            # Update the pathology instance
+            path.condition_name = condition_name
+            path.diagnosis_date = diagnosis_date
+            path.notes = notes
+
+            # Commit the changes to the database
+            try:
+                db.session.commit()
+                flash('Pathology updated successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while updating the pathology. Please try again.', 'danger')
+                app.logger.error(f'Error updating pathology: {e}')
+
+            return redirect(url_for('pathologies'))
+
+                

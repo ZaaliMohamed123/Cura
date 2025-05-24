@@ -22,7 +22,8 @@
                 <li>
                     <a href="#">
                         <span class="icon">
-                            <img class="logo" src="{{ url_for('static', filename='svg/logo_svg_5_no_back.svg') }}" alt="logo" />
+                            <img class="logo" src="{{ url_for('static', filename='svg/logo_svg_5_no_back.svg') }}"
+                                alt="logo" />
                         </span>
                     </a>
                 </li>
@@ -43,7 +44,7 @@
                     </a>
                 </li>
 
-                <li >
+                <li>
                     <a href="{{ url_for('dashboard')}}">
                         <span class="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
@@ -60,7 +61,7 @@
                     </a>
                 </li>
 
-                <li class="hovered">
+                <li>
                     <a href="{{ url_for('medications')}}">
                         <span class="icon">
                             <svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1"
@@ -89,8 +90,8 @@
                 </li>
 
 
-                <li>
-                    <a href="#">
+                <li class="hovered">
+                    <a href="{{ url_for('pathologies')}}">
                         <span class="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
                                 width="512" height="512" viewBox="0 0 55 55">
@@ -208,54 +209,43 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
 
             </div>
             <!-- ================ Medecine Form ================= -->
+            <!-- Pathology Form (same structure as medicine form) -->
             <div class="container mt-4">
-                <!-- Reuse the same card style as medicine cards -->
                 <div class="card medicine-card p-4">
                     <div class="card-body">
-                        <h3 class="mb-4 text-center text-primary fw-bold" style="color: #8cbf26 !important;">Edit Medicine</h3>
+                        <h3 class="mb-4 text-center text-primary fw-bold" style="color: #8cbf26 !important;">Edit
+                            Pathology</h3>
 
-                        
-                        <form action="{{ url_for('edit_medication', med_id=med.medication_id) }}" method="POST" class="row g-3" autocomplete="off">
+                        <form action="{{ url_for('edit_pathology', path_id=path.pathology_id) }}" method="POST"
+                            class="row g-3" autocomplete="off">
                             <div class="col-12 d-flex align-items-center mb-3">
-                                <label for="medicineName" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">Medicine Name</label>
-                                <input type="text" class="form-control flex-grow-1" id="medicineName"
-                                    name="medicineName" value="{{ med.name if med }}" required>
+                                <label for="conditionName" class="form-label fw-semibold me-3 mb-0"
+                                    style="min-width:140px;">Condition Name</label>
+                                <input type="text" class="form-control flex-grow-1" id="conditionName"
+                                    name="conditionName" value="{{ path.condition_name if path }}" required>
                             </div>
                             <div class="col-12 d-flex align-items-center mb-3">
-                                <label for="dosage" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">Dosage</label>
-                                <input type="text" class="form-control flex-grow-1" id="dosage" name="dosage"
-                                value="{{ med.dosage if med }}" required>
-                            </div>
-                            <div class="col-12 d-flex align-items-center mb-3">
-                                <label for="frequency" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">Frequency</label>
-                                <input type="text" class="form-control flex-grow-1" id="frequency" name="frequency"
-                                value="{{ med.frequency if med }}" required>
-                            </div>
-                            <div class="col-12 d-flex align-items-center mb-3">
-                                <label for="startDate" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">Start Date</label>
-                                <input type="date" class="form-control flex-grow-1" id="startDate" value="{{ med.start_date if med }}" name="startDate"
+                                <label for="diagnosisDate" class="form-label fw-semibold me-3 mb-0"
+                                    style="min-width:140px;">Diagnosis Date</label>
+                                <input type="date" class="form-control flex-grow-1" id="diagnosisDate"
+                                    name="diagnosisDate" value="{{ path.diagnosis_date.strftime('%Y-%m-%d') if path }}"
                                     required>
                             </div>
                             <div class="col-12 d-flex align-items-center mb-3">
-                                <label for="endDate" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">End Date</label>
-                                <input type="date" class="form-control flex-grow-1" id="endDate" value="{{ med.end_date if med and med.end_date}}" name="endDate">
+                                <label for="notes" class="form-label fw-semibold me-3 mb-0"
+                                    style="min-width:140px;">Notes</label>
+                                <textarea class="form-control flex-grow-1" id="notes" name="notes" rows="2"
+                                    placeholder="Additional notes...">{{ path.notes if path }}</textarea>
                             </div>
                             <div class="col-12 mt-4 d-flex justify-content-end gap-2">
                                 <button type="reset" class="btn btn-outline-secondary btn-custom">Reset</button>
                                 <button type="submit" class="btn btn-primary btn-custom"
-                                    style="background-color: #58657C;border:#58657C">Save Medicine</button>
+                                    style="background-color: #58657C;border:#58657C">Save Pathology</button>
                             </div>
                         </form>
-
                     </div>
                 </div>
             </div>
-
 
 
 
@@ -272,8 +262,8 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
 
 
     <!-- =========== Scripts =========  -->
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" ></script>
-    <script src="{{ url_for('static', filename='js/add_medication.js') }}" ></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/add_medication.js') }}"></script>
 
 
 </body>
