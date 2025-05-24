@@ -1,15 +1,30 @@
 // add hovered class to selected list item
+// add hovered class to selected list item
 let list = document.querySelectorAll(".med-navigation li");
 const logo = document.querySelector(".logo");
+// On mémorise l'élément hovered au départ
+let initiallyHovered = document.querySelector(".med-navigation li.hovered");
+console.log(initiallyHovered);
 
-// function activeLink() {
-//   list.forEach((item) => {
-//     item.classList.remove("hovered");
-//   });
-//   this.classList.add("hovered");
-// }
+list.forEach((item) => {
+  item.addEventListener("mouseover", function() {
+    list.forEach((listItem) => {
+      listItem.classList.remove("hovered");
+    });
+    this.classList.add("hovered");
+  });
 
-// list.forEach((item) => item.addEventListener("click", activeLink));
+  item.addEventListener("mouseleave", function() {
+    // Retirer la classe hovered de tous
+    list.forEach((listItem) => {
+      listItem.classList.remove("hovered");
+    });
+    // Restaurer l'élément hovered initial
+    
+    initiallyHovered.classList.add("hovered");
+    
+  });
+});
 
 // Menu Toggle
 let toggle = document.querySelector(".toggle");

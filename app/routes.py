@@ -1,6 +1,6 @@
 from flask import render_template,request,redirect,url_for,jsonify,flash
 from flask_login import login_user,logout_user,current_user,login_required
-from models import Users,Medications,Pathologies,Pharmacies
+from models import Users,Medications,Pathologies,Pharmacies,Appointments
 from datetime import datetime
 
 
@@ -396,3 +396,111 @@ def register_routes(app,db,bcrypt):
         else:
             flash('Pharmacy not found or unauthorized.', 'error')
         return redirect(url_for('pharmacies'))
+    
+    @app.route('/appointments')
+    @login_required
+    def appointments():
+        appointments = Appointments.query.filter_by(patient_id=current_user.user_id).all()
+        return render_template('appointments.html', appointments=appointments)
+
+    @app.route('/add_appointment', methods=['GET', 'POST'])
+    @login_required
+    def add_appointment():
+        if request.method == 'GET':
+            return render_template('add_appointment.html')
+        elif request.method == 'POST':
+            doctor_name = request.form.get('doctor_name')
+            appointment_date_str = request.form.get('appointment_date')
+            appointment_time_str = request.form.get('appointment_time')
+            location = request.form.get('location')
+            notes = request.form.get('notes')
+
+            if not doctor_name or not appointment_date_str or not appointment_time_str:
+                flash('Doctor name, date, and time are required!', 'danger')
+                return redirect(url_for('add_appointment'))
+
+            try:
+                appointment_date = datetime.strptime(f"{appointment_date_str} {appointment_time_str}", '%Y-%m-%d %H:%M')
+            except ValueError:
+                flash('Invalid date/time format.', 'danger')
+                return redirect(url_for('add_appointment'))
+
+            new_appointment = Appointments(
+                patient_id=current_user.user_id,
+                doctor_name=doctor_name,
+                appointment_date=appointment_date,
+                location=location,
+                notes=notes
+            )
+
+            try:
+                db.session.add(new_appointment)
+                db.session.commit()
+                flash('Appointment added successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while adding the appointment. Please try again.', 'danger')
+
+            return redirect(url_for('appointments'))
+
+    @app.route('/edit_appointment/<int:appointment_id>', methods=['GET', 'POST'])
+    @login_required
+    def edit_appointment(appointment_id):
+        appointment = Appointments.query.filter_by(appointment_id=appointment_id, patient_id=current_user.user_id).first()
+
+        if not appointment:
+            flash('Appointment not found or unauthorized.', 'danger')
+            return redirect(url_for('appointments'))
+
+        if request.method == 'GET':
+            return render_template('edit_appointment.html', appointment=appointment)
+        
+        elif request.method == 'POST':
+            doctor_name = request.form.get('doctor_name')
+            appointment_date_str = request.form.get('appointment_date')
+            appointment_time_str = request.form.get('appointment_time')
+            location = request.form.get('location')
+            notes = request.form.get('notes')
+
+            if not doctor_name or not appointment_date_str or not appointment_time_str:
+                flash('Doctor name, date, and time are required!', 'danger')
+                return render_template('edit_appointment.html', appointment=appointment)
+
+            try:
+                appointment_date = datetime.strptime(f"{appointment_date_str} {appointment_time_str}", '%Y-%m-%d %H:%M')
+            except ValueError:
+                flash('Invalid date/time format.', 'danger')
+                return render_template('edit_appointment.html', appointment=appointment)
+
+            appointment.doctor_name = doctor_name
+            appointment.appointment_date = appointment_date
+            appointment.location = location
+            appointment.notes = notes
+
+            try:
+                db.session.commit()
+                flash('Appointment updated successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while updating the appointment. Please try again.', 'danger')
+
+            return redirect(url_for('appointments'))
+
+    @app.route('/delete_appointment/<int:appointment_id>')
+    @login_required
+    def delete_appointment(appointment_id):
+        appointment = Appointments.query.filter_by(appointment_id=appointment_id, patient_id=current_user.user_id).first()
+        if appointment:
+            db.session.delete(appointment)
+            db.session.commit()
+            flash('Appointment deleted successfully.', 'success')
+        else:
+            flash('Appointment not found or unauthorized.', 'error')
+        return redirect(url_for('appointments'))
+    
+    @app.route('/signout')
+    @login_required
+    def signout():
+        logout_user()
+        flash('You have been logged out successfully.', 'success')
+        return redirect(url_for('index'))
