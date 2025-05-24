@@ -1,6 +1,6 @@
 from flask import render_template,request,redirect,url_for,jsonify,flash
 from flask_login import login_user,logout_user,current_user,login_required
-from models import Users,Medications,Pathologies
+from models import Users,Medications,Pathologies,Pharmacies
 from datetime import datetime
 
 
@@ -304,4 +304,95 @@ def register_routes(app,db,bcrypt):
 
             return redirect(url_for('pathologies'))
 
-                
+    @app.route('/pharmacies')
+    @login_required
+    def pharmacies():
+        pharmacies = Pharmacies.query.filter_by(patient_id=current_user.user_id).all()
+        return render_template('pharmacies.html', pharmacies=pharmacies)
+    
+    @app.route('/add_pharmacy', methods=['GET', 'POST'])
+    @login_required
+    def add_pharmacy():
+        if request.method == 'GET':
+            return render_template('add_pharmacy.html')
+        elif request.method == 'POST':
+            # Extract form data
+            name = request.form.get('name')
+            address = request.form.get('address')
+            phone_number = request.form.get('phone_number')
+            email = request.form.get('email')
+
+            # Validate form data
+            if not name:
+                flash('Pharmacy name is required!', 'danger')
+                return redirect(url_for('add_pharmacy'))
+
+            # Create a new Pharmacy instance
+            new_pharmacy = Pharmacies(
+                patient_id=current_user.user_id,
+                name=name,
+                address=address,
+                phone_number=phone_number,
+                email=email
+            )
+
+            # Add to the database
+            try:
+                db.session.add(new_pharmacy)
+                db.session.commit()
+                flash('Pharmacy added successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while adding the pharmacy. Please try again.', 'danger')
+                app.logger.error(f'Error adding pharmacy: {e}')
+
+            return redirect(url_for('pharmacies'))
+    
+    @app.route('/edit_pharmacy/<int:pharmacy_id>', methods=['GET', 'POST'])
+    @login_required
+    def edit_pharmacy(pharmacy_id):
+        pharmacy = Pharmacies.query.filter_by(pharmacy_id=pharmacy_id, patient_id=current_user.user_id).first()
+        
+        if not pharmacy:
+            flash('Pharmacy not found or unauthorized.', 'danger')
+            return redirect(url_for('pharmacies'))
+
+        if request.method == 'GET':
+            return render_template('edit_pharmacy.html', pharmacy=pharmacy)
+        
+        elif request.method == 'POST':
+            name = request.form.get('name')
+            address = request.form.get('address')
+            phone_number = request.form.get('phone_number')
+            email = request.form.get('email')
+
+            if not name:
+                flash('Pharmacy name is required!', 'danger')
+                return render_template('edit_pharmacy.html', pharmacy=pharmacy)
+
+            pharmacy.name = name
+            pharmacy.address = address
+            pharmacy.phone_number = phone_number
+            pharmacy.email = email
+
+            try:
+                db.session.commit()
+                flash('Pharmacy updated successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while updating the pharmacy. Please try again.', 'danger')
+                app.logger.error(f'Error updating pharmacy: {e}')
+
+            return redirect(url_for('pharmacies'))
+
+    @app.route('/delete_pharmacy/<int:pharmacy_id>')
+    @login_required
+    def delete_pharmacy(pharmacy_id):
+        pharmacy = Pharmacies.query.filter_by(pharmacy_id=pharmacy_id, patient_id=current_user.user_id).first()
+        if pharmacy:
+            db.session.delete(pharmacy)
+            db.session.commit()
+            flash('Pharmacy deleted successfully.', 'success')
+        else:
+            flash('Pharmacy not found or unauthorized.', 'error')
+        return redirect(url_for('pharmacies'))
