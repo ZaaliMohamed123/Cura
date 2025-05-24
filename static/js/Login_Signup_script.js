@@ -158,7 +158,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
         if (response.ok) {
             // Redirect to index page on successful login
-            window.location.href = "/test";
+            window.location.href = "/dashboard";
         } else {
             createToast(data.error)
             console.log(data.error)

@@ -1,0 +1,490 @@
+/* =========== Google Fonts ============ */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 300;
+  src: url("../fonts/Poppins-Light.ttf") format("truetype"),
+    url("../fonts/Poppins-Light.ttf") format("truetype");
+  font-display: swap; /* Avoid FOIT (Flash of Invisible Text) */
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../fonts/Poppins-Regular.ttf") format("truetype"),
+    url("../fonts/Poppins-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  src: url("../fonts/Poppins-Medium.ttf") format("truetype"),
+    url("../fonts/Poppins-Medium.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  src: url("../fonts/Poppins-SemiBold.ttf") format("truetype"),
+    url("../fonts/Poppins-SemiBold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  src: url("../fonts/Poppins-Bold.ttf") format("truetype"),
+    url("../fonts/Poppins-Bold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  src: url("../fonts/Poppins-Bold.ttf") format("truetype"),
+    url("../fonts/Poppins-Bold.ttf") format("truetype");
+  font-display: swap;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 900;
+  src: url("../fonts/Poppins-Bold.ttf") format("truetype"),
+    url("../fonts/Poppins-Bold.ttf") format("truetype");
+  font-display: swap;
+}
+
+/* =============== Globals ============== */
+
+body, .med-container *  {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --blue: #8cbf26;
+  --white: #fff;
+  --gray: #f5f5f5;
+  --black1: #222;
+  --black2: #999;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.med-container {
+  position: relative;
+  width: 100%;
+}
+
+/* =============== Navigation ================ */
+.med-navigation {
+  position: fixed;
+  width: 250px;
+  height: 100%;
+  background: var(--blue);
+  border-left: 10px solid var(--blue);
+  transition: 0.5s;
+  overflow: hidden;
+}
+.med-navigation.active {
+  width: 80px;
+}
+
+.med-navigation ul {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.med-navigation ul li {
+  position: relative;
+  width: 100%;
+  list-style: none;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+}
+
+/* .med-navigation ul li:hover, */
+.med-navigation ul li.hovered {
+  background-color: var(--white);
+}
+
+.med-navigation ul li:nth-child(1) {
+  margin-bottom: 40px;
+  pointer-events: none;
+}
+
+.med-navigation ul li a {
+  position: relative;
+  display: block;
+  width: 100%;
+  display: flex;
+  text-decoration: none;
+  color: var(--white);
+}
+/* .med-navigation ul li:hover a, */
+.med-navigation ul li.hovered a {
+  color: var(--blue);
+}
+
+.med-navigation ul li a .icon {
+  position: relative;
+  display: block;
+  min-width: 60px;
+  height: 60px;
+  line-height: 75px;
+  text-align: center;
+}
+
+/*Logo*/
+.med-navigation ul li a .icon .logo {
+  position: absolute;
+  display: block;
+  width: 300%;
+  height: 200%;
+  top: -20%;
+  left: -20%;
+  margin-bottom: 10px;
+}
+
+/*icons*/
+.med-navigation ul li a .icon svg {
+  width: 50%;
+  height: 50%;
+  filter: brightness(0) invert(1);
+  margin-right: -10px;
+  margin-bottom: 19px;
+  
+}
+
+.med-navigation ul li a .title {
+  position: relative;
+  display: block;
+  padding: 0 10px;
+  height: 60px;
+  line-height: 60px;
+  text-align: start;
+  white-space: nowrap;
+}
+/* .med-navigation ul li:hover a .icon svg, */
+.med-navigation ul li.hovered a .icon svg {
+  filter: brightness(0) saturate(100%) invert(61%) sepia(73%) saturate(405%) hue-rotate(38deg) brightness(94%) contrast(101%);
+}
+  
+/* --------- curve outside ---------- */
+/* .med-navigation ul li:hover a::before, */
+.med-navigation ul li.hovered a::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -50px;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border-radius: 50%;
+  box-shadow: 35px 35px 0 10px var(--white);
+  pointer-events: none;
+}
+/* .med-navigation ul li:hover a::after, */
+.med-navigation ul li.hovered a::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -50px;
+  width: 50px;
+  height: 50px;
+  background-color: transparent;
+  border-radius: 50%;
+  box-shadow: 35px -35px 0 10px var(--white);
+  pointer-events: none;
+}
+
+/* =====================core ===================== */
+.core {
+  position: absolute;
+  width: calc(100% - 250px);
+  left: 250px;
+  min-height: 100vh;
+  background: var(--white);
+  transition: 0.5s;
+}
+.core.active {
+  width: calc(100% - 80px);
+  left: 80px;
+}
+
+.topbar {
+  width: 100%;
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.toggle {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2.5rem;
+  cursor: pointer;
+}
+
+
+
+
+
+
+
+
+
+/* ====================== Responsive Design ========================== */
+@media (max-width: 991px) {
+  .med-navigation {
+    left: -300px;
+  }
+  .med-navigation.active {
+    width: 300px;
+    left: 0;
+  }
+  .core {
+    width: 100%;
+    left: 0;
+  }
+  .core.active {
+    left: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+
+}
+
+@media (max-width: 480px) {
+  .med-navigation {
+    width: 100%;
+    left: -100%;
+    z-index: 1000;
+  }
+  .med-navigation.active {
+    width: 100%;
+    left: 0;
+  }
+  .toggle {
+    z-index: 10001;
+  }
+  .core.active .toggle {
+    color: #fff;
+    position: fixed;
+    right: 0;
+    left: initial;
+  }
+}
+
+/*what i added*/
+
+.medications-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: flex-start;
+}
+.medications-btn {
+  background-color: var(--blue);
+  color: white;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background-color 0.2s, box-shadow 0.2s;
+  margin: 0 10px 0 0;
+}
+.medications-btn:hover {
+  background-color: #7dae22; /* Darker shade of green */
+  box-shadow: 0 4px 16px rgba(125, 174, 34, 0.3); /* Enhanced shadow */
+  outline: none;
+}
+
+.medications-btn:active {
+  background-color: #6e9c1f; /* Even darker shade of green */
+}
+
+
+.medicine-info span {
+  margin-right: 20px;
+}
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.medicine-card {
+  margin: 16px; /* Adds space around the card */
+  padding: 16px; /* Adds space inside the card */
+  border-radius: 8px; /* Rounds the corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  background-color: #ffffff; /* Ensures a white background */
+  transition: box-shadow 0.3s ease; /* Smooth transition on hover */
+}
+
+.medicine-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Slightly deeper shadow on hover */
+} 
+
+.btn-custom {
+  min-width: 100px;
+  padding: 0.375rem 1.5rem;
+}
+
+
+.form-control {
+  padding: 0.75rem 1.25rem; /* Wider padding for readability */
+  border-radius: 0.375rem; /* Slightly rounded corners */
+}
+
+/* Hover effect on inputs */
+.form-control:hover {
+  box-shadow: 0 0 0 1px #ced4da;
+}
+
+.container {
+  max-width: 100% !important;
+}
+
+a{
+  text-decoration: none;
+}
+
+/*notifications*/
+:root {
+  --dark: #34495e;
+  --light: #ffffff;
+  --success: #0abf30;
+  --error: #e24d4c;
+  --warning: #e9bd0c;
+  --info: #3498db;
+}
+.notifications {
+  position: fixed;
+  top: 30px;
+  right: 20px;
+  z-index: 1000;
+}
+.notifications :where(.toast, .column) {
+  display: flex;
+  align-items: center;
+}
+.notifications .toast {
+  width: 400px;
+  position: relative;
+  overflow: hidden;
+  list-style: none;
+  border-radius: 4px;
+  padding: 16px 17px;
+  margin-bottom: 10px;
+  background: var(--light);
+  justify-content: space-between;
+  animation: show_toast 0.3s ease forwards;
+}
+@keyframes show_toast {
+  0% {
+    transform: translateX(100%);
+  }
+  40% {
+    transform: translateX(-5%);
+  }
+  80% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-10px);
+  }
+}
+.notifications .toast.hide {
+  animation: hide_toast 0.3s ease forwards;
+}
+@keyframes hide_toast {
+  0% {
+    transform: translateX(-10px);
+  }
+  40% {
+    transform: translateX(0%);
+  }
+  80% {
+    transform: translateX(-5%);
+  }
+  100% {
+    transform: translateX(calc(100% + 20px));
+  }
+}
+.toast::before {
+  position: absolute;
+  content: "";
+  height: 3px;
+  width: 100%;
+  bottom: 0px;
+  left: 0px;
+  animation: progress 5s linear forwards;
+}
+@keyframes progress {
+  100% {
+    width: 0%;
+  }
+}
+.toast.success::before,
+.btn#success {
+  background: var(--success);
+}
+.toast.error::before,
+.btn#error {
+  background: var(--error);
+}
+.toast.noUser::before,
+.btn#error {
+  background: var(--error);
+}
+.toast.passProb::before,
+.btn#error {
+  background: var(--error);
+}
+.toast .column i {
+  font-size: 1.75rem;
+}
+.toast.success .column i {
+  color: var(--success);
+}
+.toast.error .column i {
+  color: var(--error);
+}
+.toast.noUser .column i {
+  color: var(--error);
+}
+.toast.passProb .column i {
+  color: var(--error);
+}
+.toast .column span {
+  font-size: 1.07rem;
+  margin-left: 12px;
+}
+.toast i:last-child {
+  color: #aeb0d7;
+  cursor: pointer;
+}
+.toast i:last-child:hover {
+  color: var(--dark);
+}
+
