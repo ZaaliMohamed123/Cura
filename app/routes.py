@@ -1,10 +1,8 @@
 from flask import render_template,request,redirect,url_for,jsonify,flash
 from flask_login import login_user,logout_user,current_user,login_required
-from models import Users,Medications,Pathologies,Pharmacies,Appointments,Medication_Reminders
+from models import Users,Medications,Pathologies,Pharmacies,Appointments,Medication_Reminders,Mentorship
 from datetime import datetime
 from functions import Load_Medicine_Data,MedicineAutocomplete
-from difflib import get_close_matches
-import re
 
 def register_routes(app,db,bcrypt):
     
@@ -546,7 +544,6 @@ def register_routes(app,db,bcrypt):
         return redirect(url_for('appointments'))
     
     @app.route('/signout')
-    @login_required
     def signout():
         logout_user()
         flash('You have been logged out successfully.', 'success')
@@ -561,3 +558,135 @@ def register_routes(app,db,bcrypt):
         query = request.args.get('query', '').strip()
         results = autocomplete_helper.autocomplete(query)
         return jsonify(results)
+    
+    @app.route('/profile')
+    @login_required
+    def profile():
+        user = current_user
+        mentor = None
+        if user.role == 'Patient':
+            mentorship = Mentorship.query.filter_by(patient_id=user.user_id).first()
+            if mentorship:
+                mentor = Users.query.get(mentorship.mentor_id)
+        return render_template('profile.html', user=user, mentor=mentor)
+    
+    @app.route('/add_mentor', methods=['GET', 'POST'])
+    @login_required
+    def add_mentor():
+        if request.method == 'POST':
+            first_name = request.form.get('mentor_first_name')
+            last_name = request.form.get('mentor_last_name')
+            email = request.form.get('mentor_email')
+            phone_number = request.form.get('mentor_phone_number')
+            date_of_birth = datetime.strptime(request.form.get('mentor_date_of_birth'), '%Y-%m-%d').date()
+            relationship = request.form.get('relationship ')
+            
+            # Check if mentor already exists
+            mentor = Users.query.filter_by(email=email).first()
+            if not mentor:
+                # Create new mentor user
+                password_hash = current_user.password_hash
+                mentor = Users(
+                    email=email,
+                    password_hash=password_hash,
+                    first_name=first_name,
+                    last_name=last_name,
+                    phone_number=phone_number,
+                    date_of_birth=date_of_birth,
+                    role='Mentor'
+                )
+                db.session.add(mentor)
+                db.session.commit()
+            
+            # Create mentorship relationship
+            mentorship = Mentorship(
+                patient_id=current_user.user_id,
+                mentor_id=mentor.user_id,
+                relationship=relationship
+            )
+            db.session.add(mentorship)
+            
+            try:
+                db.session.commit()
+                flash('Mentor added successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while adding the mentor. Please try again.', 'danger')
+            
+            return redirect(url_for('profile'))
+        
+        return render_template('add_mentor.html')
+    
+    @app.route('/edit_user/<int:user_id>', methods=['GET', 'POST'])
+    @login_required
+    def edit_user(user_id):
+        user = Users.query.get_or_404(user_id)
+        if request.method == 'POST':
+            user.first_name = request.form.get('first_name')
+            user.last_name = request.form.get('last_name')
+            user.email = request.form.get('email')
+            user.phone_number = request.form.get('phone_number')
+            date_of_birth = request.form.get('date_of_birth')
+            print(request.form.get('date_of_birth'))
+            if date_of_birth:
+                try:
+                    user.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+                except ValueError:
+                    flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
+                    return redirect(url_for('edit_user', user_id=user.user_id))
+            else:
+                user.date_of_birth = user.date_of_birth
+            
+            try:
+                db.session.commit()
+                flash('Profile updated successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while updating the profile. Please try again.', 'danger')
+            
+            return redirect(url_for('profile'))
+        elif request.method == 'GET':
+            user = Users.query.get_or_404(user_id)
+            return render_template('edit_profile.html', user=user)
+        
+    @app.route('/delete_user')
+    @login_required
+    def delete_user():
+        user = current_user
+
+        # Delete the user
+        try:
+            db.session.delete(user)
+            db.session.commit()
+            flash('User deleted successfully.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while deleting the user. Please try again.', 'danger')
+        
+        return redirect(url_for('signout'))  
+    
+    
+    @app.route('/delete_mentor/<int:user_id>')
+    @login_required
+    def delete_mentor(user_id):
+        mentor = Users.query.get(user_id)
+        if mentor == current_user:
+            flash('You cannot delete your own account.', 'danger')
+            return redirect(url_for('profile'))
+        
+        if mentor.role == 'Mentor':
+            # Delete mentorships as mentor
+            Mentorship.query.filter_by(mentor_id=user_id).delete()
+
+        # Delete the mentor
+        try:
+            db.session.delete(mentor)
+            db.session.commit()
+            flash('Mentor deleted successfully.', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while deleting the mentor. Please try again.', 'danger')
+        
+        return redirect(url_for('profile'))
+        
+        

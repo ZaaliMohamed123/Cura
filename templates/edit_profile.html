@@ -8,24 +8,27 @@
     <title>Admin Dashboard</title>
     <!-- ======= Styles ====== -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/medications_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_medication.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/boxicons.min.css') }}">
 </head>
 
 <body>
+
     <!-- =============== Navigation ================ -->
     <div class="med-container">
+
         <div class="med-navigation">
             <ul>
                 <li>
                     <a href="#">
                         <span class="icon">
-                            <img class="logo" src="{{ url_for('static', filename='svg/logo_svg_5_no_back.svg') }}" alt="logo" />
+                            <img class="logo" src="{{ url_for('static', filename='svg/logo_svg_5_no_back.svg') }}"
+                                alt="logo" />
                         </span>
                     </a>
                 </li>
 
-                <li>
+                <li class="hovered">
                     <a href="{{ url_for('profile')}}">
                         <span class="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
@@ -41,7 +44,7 @@
                     </a>
                 </li>
 
-                <li >
+                <li>
                     <a href="{{ url_for('dashboard')}}">
                         <span class="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
@@ -58,7 +61,7 @@
                     </a>
                 </li>
 
-                <li class="hovered ">
+                <li>
                     <a href="{{ url_for('medications')}}">
                         <span class="icon">
                             <svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1"
@@ -87,7 +90,7 @@
                 </li>
 
 
-                <li>
+                <li >
                     <a href="{{ url_for('pathologies')}}">
                         <span class="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -100,7 +103,7 @@
                     </a>
                 </li>
 
-                <li>
+                <li >
                     <a href="{{ url_for('pharmacies')}}">
                         <span class="icon">
                             <svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1"
@@ -190,6 +193,7 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
 
         <!-- ========================= Main ==================== -->
         <div class="core">
+            <!-- <ul class="notifications"></ul> -->
             <div class="topbar">
                 <div class="toggle">
                     <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="-80 0 700 512">
@@ -203,44 +207,52 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
                 </div>
 
 
-                <div class="medications-btns">
-                    <a href="{{url_for('add_medication')}}" class="medications-btn">Add Medication</a>
-                </div>
             </div>
-            <!-- ================ Order Details List ================= -->
-            <div class="container">
-
-                {% for med in medications %}
-                <div class="col-12">
-                    <div class="card medicine-card p-3">
-                        <!-- Top Row: Name + Buttons -->
-                        <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
-                            <h5 class="card-title mb-0">{{ med.name }}</h5>
-                            <div class="mt-2 mt-md-0 d-flex gap-2">
-                                <a href="{{ url_for('edit_medication', med_id=med.medication_id) }}" class="btn btn-primary btn-custom"
-                                    style="background-color: #58657C;border:#58657C">Edit</a>
-                                <a href="{{ url_for('delete_medication', med_id=med.medication_id) }}" class="btn btn-danger btn-custom">Delete</a>
+            <div class="container mt-4">
+                <div class="card medicine-card p-4">
+                    <div class="card-body">
+                        <h3 class="mb-4 text-center text-primary fw-bold" style="color: #8cbf26 !important;">Edit Profile</h3>
+                        <form action="{{ url_for('edit_user', user_id=user.user_id) }}" method="POST" class="row g-3" autocomplete="off">
+                            <div class="col-12 d-flex align-items-center mb-3">
+                                <label for="mentorFirstName" class="form-label fw-semibold me-3 mb-0"
+                                    style="min-width:150px;">First Name</label>
+                                <input type="text" class="form-control flex-grow-1" id="first_name" value="{{ user.first_name }} " name="first_name" required>
                             </div>
-                        </div>
-                        <!-- Medicine Info -->
-                        <div class="row">
-                            <div class="col-md-3 mb-2"><strong>Dosage:</strong> {{ med.dosage }}</div>
-                            <div class="col-md-3 mb-2"><strong>Frequency:</strong> {{ med.frequency }}</div>
-                            <div class="col-md-3 mb-2"><strong>Start Date:</strong> {{ med.start_date }}</div>
-                            <div class="col-md-3 mb-2"><strong>End Date:</strong> {{ med.end_date or 'N/A' }}</div>
-                        </div>
+                            <div class="col-12 d-flex align-items-center mb-3">
+                                <label for="mentorLastName" class="form-label fw-semibold me-3 mb-0"
+                                    style="min-width:150px;">Last Name</label>
+                                <input type="text" class="form-control flex-grow-1" id="last_name" value="{{ user.last_name }}" name="last_name" required>
+                            </div>
+                            <div class="col-12 d-flex align-items-center mb-3">
+                                <label for="mentorEmail" class="form-label fw-semibold me-3 mb-0"
+                                    style="min-width:150px;">Email</label>
+                                    <input type="email" class="form-control flex-grow-1" id="email" value="{{user.email }}" name="email"  required>
+                            </div>
+                            <div class="col-12 d-flex align-items-center mb-3">
+                                <label for="phoneNumber" class="form-label fw-semibold me-3 mb-0"
+                                    style="min-width:150px;">Phone number</label>
+                                    <input type="tel" class="form-control flex-grow-1" id="phone_number" value="{{user.phone_number}}" name="phone_number" required>
+                            </div>
+                            <div class="col-12 d-flex align-items-center mb-3">
+                                <label for="mentorDateOfBirth" class="form-label fw-semibold me-3 mb-0"
+                                    style="min-width:150px;">Date of birth</label>
+                                    <input type="date" class="form-control flex-grow-1" id="mentor_date_of_birth" name="date_of_birth" value="{{ user.date_of_birth }}" required>
+                            </div>
+                            
+                            <div class="col-12 mt-4 d-flex justify-content-end gap-2">
+                                <button type="reset" class="btn btn-outline-secondary btn-custom">Reset</button>
+                                <button type="submit" class="btn btn-primary btn-custom"
+                                    style="background-color: #58657C;border:#58657C">Save</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                {% endfor %}
-
-
-
-
-
-
-
             </div>
+
+
+
         </div>
+    </div>
     </div>
     </div>
 
@@ -250,7 +262,7 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
 
     <!-- =========== Scripts =========  -->
     <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" ></script>
-    <script src="{{ url_for('static', filename='js/medications_script.js') }}" ></script>
+    <script src="{{ url_for('static', filename='js/add_medication.js') }}" ></script>
 
 
 </body>
