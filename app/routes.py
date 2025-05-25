@@ -1,8 +1,10 @@
 from flask import render_template,request,redirect,url_for,jsonify,flash
 from flask_login import login_user,logout_user,current_user,login_required
-from models import Users,Medications,Pathologies,Pharmacies,Appointments
+from models import Users,Medications,Pathologies,Pharmacies,Appointments,Medication_Reminders
 from datetime import datetime
-
+from functions import Load_Medicine_Data
+from difflib import get_close_matches
+import re
 
 def register_routes(app,db,bcrypt):
     
@@ -69,7 +71,7 @@ def register_routes(app,db,bcrypt):
     def login():
         if request.method == 'POST':
             data = request.get_json()
-            print(data)
+            
             email = data.get('email')
             password = data.get('password')
             
@@ -89,26 +91,26 @@ def register_routes(app,db,bcrypt):
         medications = Medications.query.filter_by(patient_id=current_user.user_id).all()
         return render_template('medications.html', medications=medications)
 
+
     @app.route('/add_medication', methods=['GET', 'POST'])
-    @login_required  # Ensure only logged-in users can access this route
+    @login_required
     def add_medication():
         if request.method == 'GET':
             return render_template('add_medication.html')
         elif request.method == 'POST':
-            # Extract form data
+            # Extract form data for Medications
             name = request.form.get('medicineName')
-            dosage = request.form.get('dosage')
+            dosage = f'{request.form.get('dosage')} {request.form.get('unit')}' 
             frequency = request.form.get('frequency')
             start_date = request.form.get('startDate')
-            end_date = request.form.get('endDate')  # This is optional
-            print(name)
+            end_date = request.form.get('endDate')
 
             # Validate form data
             if not name or not dosage or not frequency or not start_date:
                 flash('All fields are required!', 'danger')
                 return redirect(url_for('add_medication'))
 
-            # Convert start_date and end_date to datetime.date objects
+            # Convert dates
             try:
                 start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
                 if end_date:
@@ -119,25 +121,47 @@ def register_routes(app,db,bcrypt):
 
             # Create a new Medication instance
             new_medication = Medications(
-                patient_id=current_user.user_id,  # Use the current_user's user_id
+                patient_id=current_user.user_id,
                 name=name,
                 dosage=dosage,
                 frequency=frequency,
                 start_date=start_date,
                 end_date=end_date
             )
-            print(new_medication)
 
-            # Add to the database
+            # Add medication to the database
             try:
                 db.session.add(new_medication)
                 db.session.commit()
-                flash('Medication added successfully!', 'success')
-                return redirect(url_for('medications'))
             except Exception as e:
                 db.session.rollback()
                 flash('An error occurred while adding the medication. Please try again.', 'danger')
                 return redirect(url_for('add_medication'))
+
+            # Extract reminder times
+            reminder_times = []                    
+            for i in range(1, int(frequency) + 1):
+                time_str = request.form.get(f'reminderTime_{i}')
+                if time_str:
+                    reminder_times.append(time_str)
+
+            # Add reminders to the database
+            try:
+                for time_str in reminder_times:
+                    time_obj = datetime.strptime(time_str, '%H:%M').time()
+                    new_reminder = Medication_Reminders(
+                        medication_id=new_medication.medication_id,
+                        patient_id=current_user.user_id,
+                        reminder_time=time_obj
+                    )
+                    db.session.add(new_reminder)
+                db.session.commit()
+                flash('Medication and reminders added successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash('An error occurred while adding the reminders. Please try again.', 'danger')
+
+            return redirect(url_for('medications'))
             
     @app.route('/delete_medication/<int:med_id>')
     @login_required
@@ -504,3 +528,41 @@ def register_routes(app,db,bcrypt):
         logout_user()
         flash('You have been logged out successfully.', 'success')
         return redirect(url_for('index'))
+    
+    @app.route('/autocomplete')
+    def autocomplete():
+        query = request.args.get('query', '').strip()
+        medicines = Load_Medicine_Data.load_medicines()
+        
+        if not query:
+            return jsonify([])
+        
+        # First, find medicines that start with the query (case-insensitive)
+        prefix_matches = [
+            medicine for medicine in medicines 
+            if medicine.lower().startswith(query.lower())
+        ]
+        
+        # If there are enough prefix matches, return them
+        if len(prefix_matches) >= 10:
+            return jsonify(prefix_matches[:10])
+        
+        # If not enough prefix matches, find medicines containing the query
+        contains_matches = [
+            medicine for medicine in medicines 
+            if query.lower() in medicine.lower() and medicine not in prefix_matches
+        ]
+        
+        # Combine and limit results
+        combined_results = prefix_matches + contains_matches
+        exact_results = combined_results[:10]
+        
+        # If still not enough results, add fuzzy matches
+        if len(exact_results) < 10:
+            fuzzy_matches = get_close_matches(query, medicines, n=10, cutoff=0.6)
+            fuzzy_results = [match for match in fuzzy_matches if match not in exact_results]
+            final_results = exact_results + fuzzy_results[:10 - len(exact_results)]
+        else:
+            final_results = exact_results
+        
+        return jsonify(final_results)

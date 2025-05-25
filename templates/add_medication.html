@@ -22,7 +22,8 @@
                 <li>
                     <a href="#">
                         <span class="icon">
-                            <img class="logo" src="{{ url_for('static', filename='svg/logo_svg_5_no_back.svg') }}" alt="logo" />
+                            <img class="logo" src="{{ url_for('static', filename='svg/logo_svg_5_no_back.svg') }}"
+                                alt="logo" />
                         </span>
                     </a>
                 </li>
@@ -43,7 +44,7 @@
                     </a>
                 </li>
 
-                <li >
+                <li>
                     <a href="{{ url_for('dashboard')}}">
                         <span class="icon">
                             <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
@@ -207,43 +208,61 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
 
 
             </div>
-            <!-- ================ Medecine Form ================= -->
             <div class="container mt-4">
-                <!-- Reuse the same card style as medicine cards -->
                 <div class="card medicine-card p-4">
                     <div class="card-body">
                         <h3 class="mb-4 text-center text-primary fw-bold" style="color: #8cbf26 !important;">Add New
                             Medicine</h3>
-
-                        
                         <form action="{{ url_for('add_medication') }}" method="POST" class="row g-3" autocomplete="off">
-                            <div class="col-12 d-flex align-items-center mb-3">
+                            <div class="col-12 d-flex align-items-center mb-3 position-relative">
                                 <label for="medicineName" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">Medicine Name</label>
+                                style="min-width:150px;">Medicine Name</label>
                                 <input type="text" class="form-control flex-grow-1" id="medicineName"
-                                    name="medicineName"  placeholder="e.g., Paracetamol" required>
+                                    placeholder="e.g., Aspro" required>
+                                <input type="hidden" name="medicineName" id="selectedMedicine">
+                                <div id="suggestions"
+                                    class="position-absolute top-100 w-100 bg-white border rounded p-2 d-none"></div>
+                            </div>
+                            <div class="col-12 d-flex align-items-center mb-3">
+                                <label for="unit" class="form-label fw-semibold me-3 mb-0"
+                                style="min-width:150px;">Unit</label>
+                                <select class="form-select flex-grow-1" id="unit" name="unit" required>
+                                    <option value="" selected disabled>Select Unit</option>
+                                    <option value="ampoule(s)">Ampoule(s)</option>
+                                    <option value="capsule(s)">Capsule(s)</option>
+                                    <option value="drop(s)">Drop(s)</option>
+                                    <option value="gram(s)">Gram(s)</option>
+                                    <option value="injection(s)">Injection(s)</option>
+                                    <option value="mg">mg</option>
+                                    <option value="ml">ml</option>
+                                    <option value="pill(s)">Pill(s)</option>
+                                    <option value="unit(s)">Unit(s)</option>
+                                    <option value="tablet(s)">Tablet(s)</option>
+                                    <option value="tablespoon(s)">Tablespoon(s)</option>
+                                    <option value="teaspoon(s)">Teaspoon(s)</option>
+                                </select>
                             </div>
                             <div class="col-12 d-flex align-items-center mb-3">
                                 <label for="dosage" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">Dosage</label>
-                                <input type="text" class="form-control flex-grow-1" id="dosage" name="dosage"
-                                placeholder="e.g., 500mg" required>
+                                    style="min-width:150px;">Amount per dose</label>
+                                    <input type="number" class="form-control flex-grow-1" id="dosage" name="dosage" placeholder="e.g., 500" required>
                             </div>
                             <div class="col-12 d-flex align-items-center mb-3">
-                                <label for="frequency" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">Frequency</label>
-                                <input type="text" class="form-control flex-grow-1" id="frequency" name="frequency"
-                                placeholder="e.g., Twice a day" required>
+                                <label for="frequency" class="form-label fw-semibold me-3 mb-0" style="min-width:150px;">Times per Day</label>
+                                <input type="number" class="form-control flex-grow-1" id="frequency" name="frequency" value="1" min="1" required>
+                            </div>
+                            <div id="reminderTimesFields" class="col-12">
+                                <!-- Dynamic reminder time fields will be inserted here -->
                             </div>
                             <div class="col-12 d-flex align-items-center mb-3">
                                 <label for="startDate" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">Start Date</label>
+                                style="min-width:150px;">Start Date</label>
                                 <input type="date" class="form-control flex-grow-1" id="startDate" name="startDate"
                                     required>
                             </div>
                             <div class="col-12 d-flex align-items-center mb-3">
                                 <label for="endDate" class="form-label fw-semibold me-3 mb-0"
-                                    style="min-width:130px;">End Date</label>
+                                style="min-width:150px;">End Date</label>
                                 <input type="date" class="form-control flex-grow-1" id="endDate" name="endDate">
                             </div>
                             <div class="col-12 mt-4 d-flex justify-content-end gap-2">
@@ -252,7 +271,6 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
                                     style="background-color: #58657C;border:#58657C">Save Medicine</button>
                             </div>
                         </form>
-
                     </div>
                 </div>
             </div>
@@ -274,7 +292,7 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
 
     <!-- =========== Scripts =========  -->
     <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/add_medication.js"></script>
+    <script src="js/add_medication_2.js"></script>
 
 
 </body>
