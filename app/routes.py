@@ -100,7 +100,7 @@ def register_routes(app,db,bcrypt):
         elif request.method == 'POST':
             # Extract form data for Medications
             name = request.form.get('medicineName')
-            dosage = f'{request.form.get('dosage')} {request.form.get('unit')}' 
+            dosage = f"{request.form.get('dosage')} {request.form.get('unit')}"
             frequency = request.form.get('frequency')
             start_date = request.form.get('startDate')
             end_date = request.form.get('endDate')
@@ -180,12 +180,16 @@ def register_routes(app,db,bcrypt):
         med = Medications.query.filter_by(medication_id=med_id, patient_id=current_user.user_id).first()
         if request.method == 'GET':
         # Render the form with the current medication data
-            return render_template('edit_medication.html', med=med)
+            # Split dosage into amount and unit
+            dosage_parts = med.dosage.split() if med.dosage else []
+            dosage = dosage_parts[0] if len(dosage_parts) >= 1 else ''
+            unit = dosage_parts[1] if len(dosage_parts) >= 2 else ''
+            return render_template('edit_medication.html', med=med, dosage=dosage,unit=unit)
 
         elif request.method == 'POST':
             # Extract form data
             name = request.form.get('medicineName')
-            dosage = request.form.get('dosage')
+            dosage = f"{request.form.get('dosage')} {request.form.get('unit')}" 
             frequency = request.form.get('frequency')
             start_date = request.form.get('startDate')
             end_date = request.form.get('endDate')  # This is optional
@@ -193,6 +197,7 @@ def register_routes(app,db,bcrypt):
             # Validate form data
             if not name or not dosage or not frequency or not start_date:
                 flash('All fields are required!', 'danger')
+                print('All fields are required!', 'danger')
                 return render_template('edit_medication.html', med=med)
 
             # Convert start_date and end_date to datetime.date objects
@@ -202,6 +207,7 @@ def register_routes(app,db,bcrypt):
                     end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
             except ValueError:
                 flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
+                print('Invalid date format. Please use YYYY-MM-DD.', 'danger')
                 return render_template('edit_medication.html', med=med)
 
             # Update the medication instance
@@ -210,6 +216,22 @@ def register_routes(app,db,bcrypt):
             med.frequency = frequency
             med.start_date = start_date
             med.end_date = end_date
+
+            # Update reminders
+            # First, delete existing reminders for this medication
+            Medication_Reminders.query.filter_by(medication_id=med.medication_id).delete()
+
+            # Add new reminders
+            for i in range(int(frequency)):
+                reminder_time_str = request.form.get(f'reminderTime_{i + 1}')
+                if reminder_time_str:
+                    reminder_time = datetime.strptime(reminder_time_str, '%H:%M').time()
+                    new_reminder = Medication_Reminders(
+                        medication_id=med.medication_id,
+                        patient_id=current_user.user_id,
+                        reminder_time=reminder_time
+                    )
+                    db.session.add(new_reminder)
 
             # Commit the changes to the database
             try:
@@ -220,7 +242,8 @@ def register_routes(app,db,bcrypt):
                 db.session.rollback()
                 flash('An error occurred while updating the medication. Please try again.', 'danger')
                 app.logger.error(f'Error updating medication: {e}')
-                return redirect(url_for('add_medication'))
+
+            
         
     @app.route('/pathologies')
     def pathologies():
