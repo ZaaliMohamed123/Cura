@@ -2,7 +2,7 @@ from flask import render_template,request,redirect,url_for,jsonify,flash
 from flask_login import login_user,logout_user,current_user,login_required
 from models import Users,Medications,Pathologies,Pharmacies,Appointments,Medication_Reminders
 from datetime import datetime
-from functions import Load_Medicine_Data
+from functions import Load_Medicine_Data,MedicineAutocomplete
 from difflib import get_close_matches
 import re
 
@@ -529,40 +529,12 @@ def register_routes(app,db,bcrypt):
         flash('You have been logged out successfully.', 'success')
         return redirect(url_for('index'))
     
+    # Load medicines when the application starts
+    medicines = Load_Medicine_Data.load_medicines()
+    autocomplete_helper = MedicineAutocomplete.MedicineAutocomplete(medicines)
+
     @app.route('/autocomplete')
     def autocomplete():
         query = request.args.get('query', '').strip()
-        medicines = Load_Medicine_Data.load_medicines()
-        
-        if not query:
-            return jsonify([])
-        
-        # First, find medicines that start with the query (case-insensitive)
-        prefix_matches = [
-            medicine for medicine in medicines 
-            if medicine.lower().startswith(query.lower())
-        ]
-        
-        # If there are enough prefix matches, return them
-        if len(prefix_matches) >= 10:
-            return jsonify(prefix_matches[:10])
-        
-        # If not enough prefix matches, find medicines containing the query
-        contains_matches = [
-            medicine for medicine in medicines 
-            if query.lower() in medicine.lower() and medicine not in prefix_matches
-        ]
-        
-        # Combine and limit results
-        combined_results = prefix_matches + contains_matches
-        exact_results = combined_results[:10]
-        
-        # If still not enough results, add fuzzy matches
-        if len(exact_results) < 10:
-            fuzzy_matches = get_close_matches(query, medicines, n=10, cutoff=0.6)
-            fuzzy_results = [match for match in fuzzy_matches if match not in exact_results]
-            final_results = exact_results + fuzzy_results[:10 - len(exact_results)]
-        else:
-            final_results = exact_results
-        
-        return jsonify(final_results)
+        results = autocomplete_helper.autocomplete(query)
+        return jsonify(results)
