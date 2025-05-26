@@ -3,6 +3,7 @@ from flask_login import login_user,logout_user,current_user,login_required
 from models import Users,Medications,Pathologies,Pharmacies,Appointments,Medication_Reminders,Mentorship
 from datetime import datetime
 from functions import Load_Medicine_Data,MedicineAutocomplete
+import random
 
 def register_routes(app,db,bcrypt):
     
@@ -10,9 +11,6 @@ def register_routes(app,db,bcrypt):
     def index():
         return render_template("Login_Signup.html")
     
-    @app.route('/dashboard')
-    def dashboard():
-        return render_template("dashboard.html")
     
     @app.route('/signup', methods=['GET', 'POST'])
     def signup():
@@ -689,4 +687,59 @@ def register_routes(app,db,bcrypt):
         
         return redirect(url_for('profile'))
         
-        
+    
+    motivational_quotes = Load_Medicine_Data.load_quotes()    
+    @app.route('/dashboard')
+    @login_required
+    def dashboard():
+        # Greeting message
+        greeting_message = f"Welcome back, {current_user.first_name}!"
+        welcome_message = "Welcome to Cura, your trusted medical reminder! We're here to ensure you never miss a dose and stay on top of your health. Wishing you a wonderful and healthy day ahead!"
+
+
+
+        motivational_quote = random.choice(motivational_quotes)
+
+        # AI Alerts (Mock data)
+        ai_alerts = None
+
+        # # Next Dose
+        # now = datetime.now()
+        # medications = Medications.query.filter_by(patient_id=current_user.user_id).all()
+        # next_dose = None
+        # for med in medications:
+        #     # Assuming you have a method to get the next scheduled dose time
+        #     next_dose_time = get_next_dose_time(med)
+        #     if next_dose_time and (not next_dose or next_dose_time < next_dose.time):
+        #         next_dose = {
+        #             'medication_name': med.name,
+        #             'dosage': med.dosage,
+        #             'time_left': (next_dose_time - now).seconds // 60
+        #         }
+
+        # # Medications Taken Today
+        # today = datetime.now().date()
+        # today_logs = Medication_Intake_Logging.query.filter(
+        #     db.func.date(Medication_Intake_Logging.intake_time) == today,
+        #     Medication_Intake_Logging.patient_id == current_user.user_id
+        # ).all()
+        # medications_taken_today = len(today_logs)
+
+        # # Notifications
+        # notifications = [
+        #     {'id': 1, 'message': 'Time to take your medication!', 'type': 'warning'},
+        #     {'id': 2, 'message': 'Your prescription is almost empty.', 'type': 'info'},
+        #     {'id': 3, 'message': 'You have a doctor appointment tomorrow.', 'type': 'info'}
+        # ]
+
+        return render_template(
+            'dashboard.html',
+            greeting_message=greeting_message,
+            welcome_message=welcome_message,
+            motivational_quote=motivational_quote,
+            ai_alerts=ai_alerts,
+            # next_dose=next_dose,
+            # medications_taken_today=medications_taken_today,
+            # today_logs=today_logs,
+            # notifications=notifications
+        )

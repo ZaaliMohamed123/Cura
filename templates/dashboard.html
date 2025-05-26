@@ -20,7 +20,8 @@
                 <li>
                     <a href="#">
                         <span class="icon">
-                            <img class="logo" src="{{ url_for('static', filename='svg/logo_svg_5_no_back.svg') }}" alt="logo" />
+                            <img class="logo" src="{{ url_for('static', filename='svg/logo_svg_5_no_back.svg') }}"
+                                alt="logo" />
                         </span>
                     </a>
                 </li>
@@ -58,7 +59,7 @@
                     </a>
                 </li>
 
-                <li >
+                <li>
                     <a href="{{ url_for('medications')}}">
                         <span class="icon">
                             <svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1"
@@ -121,7 +122,7 @@
                 </li>
 
                 <li>
-                    <a  href="{{ url_for('appointments')}}">
+                    <a href="{{ url_for('appointments')}}">
                         <span class="icon">
                             <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="1136.000000pt"
                                 height="1280.000000pt" viewBox="0 0 1136.000000 1280.000000"
@@ -203,14 +204,83 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
                 </div>
 
 
-                
+
             </div>
             <!-- ================ Order Details List ================= -->
-            
+            <div class="container mt-4">
+                <div class="card medicine-card p-3">
+                    <!-- Greeting Card -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
+                        <h3 class="text-primary" style="color: #8cbf26 !important;">{{ greeting_message }}</h3>
+                    </div>
+                    <div class="text-muted">{{ welcome_message }}</div>
+                </div>
 
-    <!-- =========== Scripts =========  -->
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}" ></script>
-    <script src="{{ url_for('static', filename='js/medications_script.js') }}" ></script>
+                <div class="card medicine-card p-3">
+                    <!-- Greeting Card -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-1">
+                        <h4 class="text-primary ">Daily Motivation</h4>
+
+                    </div>
+                    <div class="card-text">{{ motivational_quote }}</div>
+                </div>
+
+                <div class="card medicine-card p-3">
+                    <!-- Greeting Card -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-1">
+                        <h4 class="text-primary " style="color: red !important;">AI Alerts</h4>
+
+                    </div>
+                    {% if ai_alerts %}
+                        {% for alert in ai_alerts %}
+                        <div class="card-text alert alert-warning mb-2">
+                            {{ alert }}
+                        </div>
+                        {%endfor%}
+                    {% else %}
+                    <div class="card-text">No alerts at the moment.</div>
+                    {% endif %}
+
+                    </div>
+                </div>
+
+                <div class="card medicine-card p-3">
+                    <!-- Next Dose Card -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Next Dose</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if next_dose %}
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h4 class="mb-1">{{ next_dose.medication_name }}</h4>
+                                <p class="text-muted mb-1">{{ next_dose.dosage }}</p>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge bg-primary">{{ next_dose.time_left }}</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-center">No upcoming doses.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+
+
+                    
+
+                </div>
+            </div>
+
+
+
+            <!-- =========== Scripts =========  -->
+            <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='js/medications_script.js') }}"></script>
 
 
 </body>
