@@ -234,7 +234,7 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
                     {% if ai_alerts %}
                         {% for alert in ai_alerts %}
                         <div class="card-text alert alert-warning mb-2">
-                            {{ alert }}
+                            {{ alert['message'] }}
                         </div>
                         {%endfor%}
                     {% else %}
@@ -244,36 +244,30 @@ m2705 -3123 l0 -210 210 0 210 0 0 -180 0 -180 -210 0 -210 0 0 -210 0 -210
                     </div>
                 </div>
 
+                <!-- Next Dose Card -->
                 <div class="card medicine-card p-3">
-                    <!-- Next Dose Card -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Next Dose</h5>
+                    <!-- Top Row: Name + Buttons -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+                        <h5 class="card-title mb-0" style="color: #AED9E0 !important;">Next Dose</h5>
                     </div>
-                    <div class="card-body">
-                        {% if next_dose %}
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h4 class="mb-1">{{ next_dose.medication_name }}</h4>
-                                <p class="text-muted mb-1">{{ next_dose.dosage }}</p>
-                            </div>
-                            <div class="col-auto">
-                                <span class="badge bg-primary">{{ next_dose.time_left }}</span>
-                            </div>
-                        </div>
-                        {% else %}
-                        <p class="text-center">No upcoming doses.</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+                    <!-- Medicine Info -->
+                    {% if next_dose %}
+                    <div class="row">
+                        <div class="col-md-3 mb-2" style="font-size: large;"><strong>{{ next_dose.medication_name }}</strong> </div>
+                        <div class="col-md-3 mb-2"><strong>Amount per dose:</strong> {{ next_dose.dosage }}</div>
+                        <div class="col-md-3 mb-2"><strong>Time left:</strong> {{ next_dose.time_left }}</div>
 
+                    </div>
+                    {% else %}
+                    <div class="card-text text-center">No upcoming doses.</div>
+                    {% endif %}
+                </div>
+                
 
 
                     
 
-                </div>
+                
             </div>
 
 

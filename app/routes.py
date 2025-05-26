@@ -1,9 +1,16 @@
 from flask import render_template,request,redirect,url_for,jsonify,flash
 from flask_login import login_user,logout_user,current_user,login_required
 from models import Users,Medications,Pathologies,Pharmacies,Appointments,Medication_Reminders,Mentorship
-from datetime import datetime
-from functions import Load_Medicine_Data,MedicineAutocomplete
+from datetime import datetime,timedelta
+from functions import Load_Medicine_Data,MedicineAutocomplete,GetNextDoseTime
 import random
+# Import the DDI functions and the local model instance
+from functions.ddi_model_utilities import (
+    predict_interaction_with_local_model,
+    get_patient_friendly_ddi_alert,
+    model as local_ddi_ml_model #  Import the loaded model instance
+)
+import itertools # For getting combinations of medications
 
 def register_routes(app,db,bcrypt):
     
@@ -700,22 +707,94 @@ def register_routes(app,db,bcrypt):
 
         motivational_quote = random.choice(motivational_quotes)
 
-        # AI Alerts (Mock data)
-        ai_alerts = None
-
-        # # Next Dose
-        # now = datetime.now()
+        # --- AI DDI Alerts ---
+        ai_alerts = []
         # medications = Medications.query.filter_by(patient_id=current_user.user_id).all()
-        # next_dose = None
-        # for med in medications:
-        #     # Assuming you have a method to get the next scheduled dose time
-        #     next_dose_time = get_next_dose_time(med)
-        #     if next_dose_time and (not next_dose or next_dose_time < next_dose.time):
-        #         next_dose = {
-        #             'medication_name': med.name,
-        #             'dosage': med.dosage,
-        #             'time_left': (next_dose_time - now).seconds // 60
-        #         }
+        # Uncomment above and comment below when using real DB
+        
+        # Using MOCK_MEDICATIONS_DATA for easier testing without full DB setup
+        # Replace with your actual Medications query when ready
+        # Ensure your Medications model has a 'name' attribute for the drug name
+        medications_for_user = Medications.query.filter_by(patient_id=current_user.user_id).all()
+        # medications_for_user = MOCK_MEDICATIONS_DATA # For testing with mock data
+
+        if len(medications_for_user) >= 2:
+            # Get all unique pairs of medications
+            medication_pairs = itertools.combinations(medications_for_user, 2)
+            for med1_obj, med2_obj in medication_pairs:
+                drug1_name = med1_obj.name
+                drug2_name = med2_obj.name
+
+                print(f"Checking DDI for: {drug1_name} and {drug2_name}") # For debugging
+
+                # 1. Get prediction from your local model
+                local_pred_label, local_pred_conf, error_msg = predict_interaction_with_local_model(
+                    drug1_name, drug2_name, local_ddi_ml_model # Pass the loaded model instance
+                )
+
+                if error_msg:
+                    # Handle cases where local model couldn't predict (e.g., SMILES not found)
+                    # You might want a generic alert or log this.
+                    # For now, we'll try to get an LLM assessment anyway if names are valid.
+                    print(f"Local model error for {drug1_name}-{drug2_name}: {error_msg}")
+                    # If SMILES or FP error, local_pred_label might be "SMILES Error"
+                    # We can still pass this to the LLM, or decide to skip
+                    if "Error" in local_pred_label: # Simple check if it was an error
+                        patient_alert = get_patient_friendly_ddi_alert(drug1_name, drug2_name, "Error in local check", 0.0)
+                    else: # Should not happen if error_msg is present, but as a fallback
+                        patient_alert = get_patient_friendly_ddi_alert(drug1_name, drug2_name, local_pred_label, local_pred_conf)
+
+                else:
+                    # 2. Get patient-friendly assessment from LLM
+                    patient_alert = get_patient_friendly_ddi_alert(
+                        drug1_name, drug2_name, local_pred_label, local_pred_conf
+                    )
+
+                if patient_alert:
+                    # Add to alerts if the LLM provided a message.
+                    # You might want to filter further, e.g., only add if it starts with "Alert:" or "Important:"
+                    if patient_alert.lower().startswith(("alert:", "important:", "warning:")):
+                        ai_alerts.append({"message": patient_alert, "type": "warning"}) # Add a type for styling
+                    elif "good news:" in patient_alert.lower() or "generally considered safe" in patient_alert.lower():
+                        ai_alerts.append({"message": patient_alert, "type": "info"}) # For positive confirmations
+                    # else:
+                    #     # If LLM returns something unexpected or non-committal, maybe log it
+                    #     # and don't show to patient or show a generic message.
+                    #     print(f"LLM returned neutral/unclear for {drug1_name}-{drug2_name}: {patient_alert}")
+
+        # Next Dose
+        now = datetime.now()
+        next_dose = None
+        medications = Medications.query.filter_by(patient_id=current_user.user_id).all()
+        
+        for med in medications:
+            reminders = Medication_Reminders.query.filter_by(medication_id=med.medication_id).all()
+            next_dose_time = GetNextDoseTime.get_next_dose_time(med,reminders)
+            # Format the time left
+            if next_dose_time:
+                time_left = next_dose_time - now
+                total_seconds = time_left.total_seconds()
+                
+                if total_seconds < 60:
+                    time_left= f"{int(total_seconds)}s"
+                elif total_seconds < 3600:
+                    minutes = int(total_seconds // 60)
+                    seconds = int(total_seconds % 60)
+                    time_left= f"{minutes}m {seconds}s"
+                else:
+                    hours = int(total_seconds // 3600)
+                    minutes = int((total_seconds % 3600) // 60)
+                    time_left= f"{hours}h {minutes}m"
+            else:
+                return "Medication has ended"
+                
+            
+                
+            next_dose = {
+                'medication_name': med.name,
+                'dosage': med.dosage,
+                'time_left': time_left
+            }
 
         # # Medications Taken Today
         # today = datetime.now().date()
@@ -738,7 +817,7 @@ def register_routes(app,db,bcrypt):
             welcome_message=welcome_message,
             motivational_quote=motivational_quote,
             ai_alerts=ai_alerts,
-            # next_dose=next_dose,
+            next_dose=next_dose,
             # medications_taken_today=medications_taken_today,
             # today_logs=today_logs,
             # notifications=notifications
