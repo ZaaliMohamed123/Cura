@@ -1,6 +1,6 @@
 # Cura - Medical Management System
 
-MediMate is a comprehensive Flask-based web application designed for managing patient medications, pathologies, appointments, and providing drug-drug interaction (DDI) analysis using machine learning and AI. The system includes features for medication tracking, mentor-patient relationships, pharmacy management, and intelligent medication safety checks.
+Cura is a comprehensive Flask-based web application designed for managing patient medications, pathologies, appointments, and providing drug-drug interaction (DDI) analysis using machine learning and AI. The system includes features for medication tracking, mentor-patient relationships, pharmacy management, and intelligent medication safety checks.
 
 ## 🌟 Features
 
