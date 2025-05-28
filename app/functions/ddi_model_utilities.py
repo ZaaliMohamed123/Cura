@@ -6,6 +6,7 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem.AllChem import GetMorganGenerator
 import os
+from dotenv import load_dotenv
 import google.generativeai as genai
 
 # --- Your Local ML Model Definition ---
@@ -62,7 +63,8 @@ model.eval()
 
 
 # --- LLM Configuration ---
-API_KEY = "AIzaSyBkAdsUxzqVaS1Oyrp-ZYsN6Y1Qn1hP8IE"
+load_dotenv()  # Load environment variables from .env file
+API_KEY = os.getenv('GOOGLE_API_KEY')
 llm_model = None
 if API_KEY:
     try:

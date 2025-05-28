@@ -13,4 +13,11 @@ __pycache__/
 .idea/
 *.iml
 
+# Ignore environment configuration file
+.env
 
+# Ignore application instance folder
+app/instance/
+
+# Ignore database migrations folder
+app/migrations/
