@@ -21,3 +21,6 @@ app/instance/
 
 # Ignore database migrations folder
 app/migrations/
+
+
+Installations and requirements.md
