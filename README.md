@@ -53,7 +53,7 @@ MediMate/
 - **Python 3.8 or higher**
 - **SQLite** (included with Python)
 - **Git**
-- **Google API Key** (optional, for enhanced DDI analysis)(it's free you can get your api key from https://aistudio.google.com/apikey)
+- **Google API Key** (it's free you can get your api key from https://aistudio.google.com/apikey)
 
 ## 🚀 Installation & Setup
 
