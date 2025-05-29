@@ -86,18 +86,20 @@ pip install -r requirements.txt
 
 ### 4. Environment Configuration
 
-The application uses environment variables for configuration. A `.env` file is already included in the `app/` directory with default values:
+The application uses environment variables for configuration. Create a `.env` file in the `app/` directory:
 
-```env
-SECRET_KEY=fb4af99da33dc69ea80b9efcb73fcbaa62641683f8a1ef613d1f00911e473cf2
-DATABASE_URL=sqlite:///./MediMateDB.db
-GOOGLE_API_KEY="your_google_api_key_here"
-```
-
-**Important**: For production use, generate a new secret key:
+in a separate python file genereate a secret key using :
 ```python
 import secrets
-print(secrets.token_hex(32))
+print(secrets.token_hex(64))
+```
+
+Add those varibales to .env file
+
+```env
+SECRET_KEY="Your_secret_key_here"
+DATABASE_URL=sqlite:///./CuraDB.db
+GOOGLE_API_KEY="your_google_api_key_here"
 ```
 
 ### 5. Database Setup
